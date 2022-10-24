@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9523e35e-0f90-46f4-afa3-f95bbf06b150" >
+		<http:listener-connection host="0.0.0.0" port="8083" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="dd2fa584-fc8b-475b-ba91-7a8570f77750" >
+		<http:request-connection host="reqres.in" port="80" />
+	</http:request-config>
+	<flow name="rest_servis_demoFlow" doc:id="f8a9de24-0ebe-44e4-81f6-a56908245f68" >
+		<http:listener doc:name="Listener" doc:id="50f253fe-f269-4a9b-967d-f7bf5e8268eb" config-ref="HTTP_Listener_config" path="/users"/>
+		<set-variable value="#[payload.id]" doc:name="Set Variable" doc:id="baf253c5-b946-451e-b0b3-53bba0597d72" variableName="userid"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0f1c30ce-d9a1-413b-9614-384b06106ee6" message="i am trying to invoke REST servic"/>
+		<http:request method="GET" doc:name="Request" doc:id="8f964398-adb8-4ccd-8eb1-5565f7bc5016" config-ref="HTTP_Request_configuration" path="#['/api/users/' ++ vars.userid as String]"/>
+		<ee:transform doc:name="Transform Message" doc:id="df16ede2-4432-43c5-88e5-87f60d7a5a42" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.data]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
